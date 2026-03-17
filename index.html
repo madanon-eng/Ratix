@@ -39,6 +39,7 @@ body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#000;text-al
 .cartao-pacote.mcel button{background:#007bff;}
 .cartao-pacote.streaming button{background:#111;}
 .logo-streaming{width:70px;height:auto;margin:0 auto 8px;user-select:none;}
+
 .ilimitados-menu{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;}
 .btn-ilimitados{width:85%;padding:14px 0;border:none;border-radius:12px;color:#fff;font-weight:800;cursor:pointer;box-shadow:0 4px 7px rgba(0,0,0,.2);font-size:16px;}
 
@@ -46,21 +47,22 @@ body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#000;text-al
 
 #suporteWhatsApp{position:fixed;bottom:60px;right:10px;z-index:111;}
 #suporteWhatsApp a{display:flex;align-items:center;text-decoration:none;}
-#suporteWhatsApp img{width:60px;height:10ppx;}
+#suporteWhatsApp img{width:60px;height:60px;}
 
-#overlayBotao{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:25px;border-radius:20px;display:none;flex-direction:column;align-items:center;box-shadow:0 5px 20px rgba(0,0,0,.4);z-index:999;}
-#btnAbrirFormulario{background:#198754;color:#fff;border:none;padding:12px 20px;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:10px;}
+#overlayBotao{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:25px;border-radius:20px;display:none;flex-direction:column;align-items:center;box-shadow:0 5px 20px rgba(0,0,0,.4);z-index:999;width:90%;max-width:400px;}
+#btnAbrirFormulario{background:#198754;color:#fff;border:none;padding:12px 20px;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:10px;width:100%;}
 .fechar{position:absolute;top:10px;right:10px;background:red;color:#fff;border:none;border-radius:50%;width:25px;height:25px;cursor:pointer;}
+
+#numeroReceber{width:100%;padding:10px 12px;margin-top:12px;margin-bottom:6px;font-size:15px;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;}
+#erroNumero{color:red;font-size:14px;margin:6px 0;display:none;text-align:left;width:100%;}
 .pacotes.dimmed .cartao-pacote{opacity:0.3;pointer-events:none;}
 </style>
 </head>
 <body>
-
 <div class="container">
   <div class="titulo">Melhor fornecedora de internet da atualidade</div>
   <div class="equalizer"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
 
-  <!-- BOTÃO VERDE VOLTAR -->
   <button class="voltar-top" id="voltarPacotes" onclick="voltarOperadoras()">Voltar às Operadoras</button>
 
   <h2 id="tituloOperadora">Selecione a Operadora</h2>
@@ -76,9 +78,7 @@ body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#000;text-al
   <div class="pacotes" id="pacotes"></div>
 </div>
 
-<!-- ÍCONE WHATSAPP FIXO (apenas ícone) -->
 <div id="suporteWhatsApp">
-  <a href="" target="_blank">
   <a href="https://wa.me/258842372840" target="_blank">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"/>
   </a>
@@ -87,29 +87,33 @@ body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#000;text-al
 <div id="overlayBotao">
   <button class="fechar" onclick="fecharOverlay()">X</button>
   <h4 id="pacoteOverlayTexto"></h4>
+  <input type="text" id="numeroReceber" placeholder="Número a receber"/>
+  <div id="erroNumero">Por favor, insira um número válido com 9 dígitos.</div>
   <button id="btnAbrirFormulario">Preencher Formulário</button>
 </div>
 
 <script>
 let pacoteSelecionado="";
+let operadoraAtual="";
 const cores={vodacom:'#e60000',movitel:'#ff8c00',mcel:'#007bff',streaming:'#111'};
 
 const pacotesData={
-vodacom:['10GB - 115MT','20GB - 220MT','30GB - 330MT','40GB - 440MT','50GB - 550MT','60GB - 660MT','70GB - 770MT','80GB - 880MT','90GB - 990MT','100GB - 1000MT','120GB - 1200MT','130GB - 1300MT','140GB - 1400MT','150GB - 1500MT'],
-movitel:['10GB - 115MT','20GB - 225MT','30GB - 325MT','40GB - 444MT','50GB - 555MT','60GB - 665MT','70GB - 775MT','80GB - 885MT','90GB - 995MT','100GB - 1005MT','110GB - 1115MT','120GB - 1225MT','130GB - 1335MT','140GB - 1445MT','150GB - 1555MT','160GB - 1665MT'],
-mcel:['10GB - 110MT','20GB - 220MT','30GB - 315MT','40GB - 424MT'],
-streaming:[
-{name:'Netflix - 1 Mês - 225MT',logo:'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg'},
-{name:'Spotify - 1 Mês - 160MT',logo:'https://upload.wikimedia.org/wikipedia/commons/2/26/Spotify_logo_with_text.svg'}
-],
-ilimitados:{
-vodacom:['Chamadas + SMS ilimitados + 20GB - 380MT','Chamadas + SMS ilimitados + 40GB - 640MT'],
-movitel:['Chamadas + SMS ilimitados + 20GB - 380MT','Chamadas + SMS ilimitados + 40GB - 640MT'],
-mcel:['Chamadas + SMS ilimitados + 20GB - 380MT','Chamadas + SMS ilimitados + 40GB - 640MT']
-}
+ vodacom:['10GB - 110MT','20GB - 220MT','30GB - 330MT','40GB - 440MT','50GB - 550MT','60GB - 660MT','70GB - 770MT','80GB - 880MT','90GB - 990MT','100GB - 1000MT','120GB - 1200MT','130GB - 1300MT','140GB - 1400MT','150GB - 1500MT'],
+ movitel:['10GB - 115MT','20GB - 225MT','30GB - 325MT','40GB - 444MT','50GB - 555MT','60GB - 665MT','70GB - 775MT','80GB - 885MT','90GB - 995MT','100GB - 1005MT','110GB - 1115MT','120GB - 1225MT','130GB - 1335MT','140GB - 1445MT','150GB - 1555MT','160GB - 1665MT'],
+ mcel:['10GB - 110MT','20GB - 220MT','30GB - 315MT','40GB - 424MT'],
+ streaming:[
+   {name:'Netflix - 1 Mês - 225MT',logo:'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg'},
+   {name:'Spotify - 1 Mês - 160MT',logo:'https://upload.wikimedia.org/wikipedia/commons/2/26/Spotify_logo_with_text.svg'}
+ ],
+ ilimitados:{
+   vodacom:['Chamadas + SMS ilimitados + 20GB - 380MT','Chamadas + SMS ilimitados + 40GB - 640MT'],
+   movitel:['Chamadas + SMS ilimitados + 20GB - 380MT','Chamadas + SMS ilimitados + 40GB - 640MT'],
+   mcel:['Chamadas + SMS ilimitados + 20GB - 380MT','Chamadas + SMS ilimitados + 40GB - 640MT']
+ }
 };
 
 function clicarOperadora(tipo){
+  operadoraAtual = tipo;
   document.getElementById('operadoras').style.display='none';
   document.getElementById('voltarPacotes').style.display='block';
   const pacotesDiv=document.getElementById('pacotes');
@@ -123,7 +127,7 @@ function clicarOperadora(tipo){
       const btn=document.createElement('button');
       btn.textContent='Comprar';
       btn.style.backgroundColor=cores.streaming;
-      btn.onclick=()=>abrirOverlay(p.name);
+      btn.onclick=()=>abrirOverlay(p.name, tipo);
       card.appendChild(btn);
       pacotesDiv.appendChild(card);
     });
@@ -146,7 +150,7 @@ function clicarOperadora(tipo){
       const btn=document.createElement('button');
       btn.textContent='Comprar';
       btn.style.backgroundColor=cores[tipo];
-      btn.onclick=()=>abrirOverlay(p);
+      btn.onclick=()=>abrirOverlay(p, tipo);
       card.appendChild(btn);
       pacotesDiv.appendChild(card);
     });
@@ -154,6 +158,7 @@ function clicarOperadora(tipo){
 }
 
 function clicarIlimitadosOperadora(op){
+  operadoraAtual = op;
   const pacotesDiv=document.getElementById('pacotes');
   pacotesDiv.innerHTML='';
   pacotesData.ilimitados[op].forEach(p=>{
@@ -163,7 +168,7 @@ function clicarIlimitadosOperadora(op){
     const btn=document.createElement('button');
     btn.textContent='Comprar';
     btn.style.backgroundColor=cores[op];
-    btn.onclick=()=>abrirOverlay(p);
+    btn.onclick=()=>abrirOverlay(p, op);
     card.appendChild(btn);
     pacotesDiv.appendChild(card);
   });
@@ -175,11 +180,27 @@ function voltarOperadoras(){
   document.getElementById('voltarPacotes').style.display='none';
 }
 
-function abrirOverlay(pacote){
+function abrirOverlay(pacote, operadora){
   pacoteSelecionado=pacote;
+  operadoraAtual = operadora;
+  const overlay = document.getElementById('overlayBotao');
+  const inputNumero = document.getElementById('numeroReceber');
+  const erroDiv = document.getElementById('erroNumero');
   document.getElementById('pacoteOverlayTexto').innerText=pacote;
-  document.getElementById('overlayBotao').style.display='flex';
+  overlay.style.display='flex';
   document.getElementById('pacotes').classList.add('dimmed');
+
+  if(operadora==='streaming'){
+    inputNumero.style.display='none';
+    erroDiv.style.display='none';
+  } else {
+    inputNumero.style.display='block';
+    erroDiv.style.display='none';
+    if(operadora==='vodacom'){ inputNumero.placeholder='Número Vodacom (84/85...)'; }
+    else if(operadora==='movitel'){ inputNumero.placeholder='Número Movitel (86/87...)'; }
+    else if(operadora==='mcel'){ inputNumero.placeholder='Número Mcel (82/83...)'; }
+    inputNumero.value='';
+  }
 }
 
 function fecharOverlay(){
@@ -187,22 +208,47 @@ function fecharOverlay(){
   document.getElementById('pacotes').classList.remove('dimmed');
 }
 
-document.getElementById('btnAbrirFormulario').onclick=function(){
-  if(pacoteSelecionado.includes("10GB - 115MT")){
-    window.location.href="https://ratixpay.site/checkout.html?produto=SDWJCT9R6"; return;
+// ===== Validação 9 dígitos + prefixo =====
+document.getElementById('btnAbrirFormulario').onclick = function() {
+  const numero = document.getElementById('numeroReceber').value.trim();
+  const erroDiv = document.getElementById('erroNumero');
+
+  if(operadoraAtual !== 'streaming'){
+    const regex = /^\d{9}$/;
+    if(!regex.test(numero)){
+      erroDiv.innerText = 'Por favor, insira um número com 9 dígitos.';
+      erroDiv.style.display='block';
+      return;
+    }
+    // Validação prefixo
+    const prefix = numero.substring(0,2);
+    if(operadoraAtual==='vodacom' && !(prefix==='84'||prefix==='85')){
+      erroDiv.innerText = 'Número Vodacom deve começar com 84 ou 85.';
+      erroDiv.style.display='block';
+      return;
+    }
+    if(operadoraAtual==='movitel' && !(prefix==='86'||prefix==='87')){
+      erroDiv.innerText = 'Número Movitel deve começar com 86 ou 87.';
+      erroDiv.style.display='block';
+      return;
+    }
+    if(operadoraAtual==='mcel' && !(prefix==='82'||prefix==='83')){
+      erroDiv.innerText = 'Número Mcel deve começar com 82 ou 83.';
+      erroDiv.style.display='block';
+      return;
+    }
   }
-  if(pacoteSelecionado.includes("20GB - 220MT")){
-    window.location.href="https://ratixpay.site/checkout.html?produto=70GTO925E"; return;
-  }
-  if(pacoteSelecionado.includes("225") || pacoteSelecionado.includes("225MT") || pacoteSelecionado.includes("Netflix")){
-    window.location.href="https://ratixpay.site/checkout.html?produto=0TR93S9PO"; return;
-  }
-  if(pacoteSelecionado.includes("380MT") || pacoteSelecionado.includes("380MT") || pacoteSelecionado.includes("ilimitado")){
-    window.location.href="https://ratixpay.site/checkout.html?produto=EEF1IFZLU"; return;
-  }
+
+  erroDiv.style.display='none';
+
+  if(pacoteSelecionado.includes("10GB - 115MT")){ window.location.href="https://ratixpay.site/checkout.html?produto=SDWJCT9R6"; return; }
+  if(pacoteSelecionado.includes("10GB - 110MT")){ window.location.href="https://ratixpay.site/checkout.html?produto=579P1DG45"; return; }
+  if(pacoteSelecionado.includes("20GB - 220MT")){ window.location.href="https://ratixpay.site/checkout.html?produto=70GTO925E"; return; }
+  if(pacoteSelecionado.includes("225") || pacoteSelecionado.includes("225MT") || pacoteSelecionado.includes("Netflix")){ window.location.href="https://ratixpay.site/checkout.html?produto=0TR93S9PO"; return; }
+  if(pacoteSelecionado.includes("380MT") || pacoteSelecionado.includes("ilimitado")){ window.location.href="https://ratixpay.site/checkout.html?produto=EEF1IFZLU"; return; }
+
   alert("Este pacote ainda não tem link de pagamento.");
 };
 </script>
-
 </body>
 </html>
